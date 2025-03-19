@@ -35,7 +35,7 @@ def get_input():
                 continue
             # 始点と終点の駅IDが異なるか確認
             if a == b:
-                print("始点IDと終点IDは異なるIDを指定してください. (同一駅をループする路線は入力できません.)")
+                print("自己ループの経路は同じ点を2回通るため探索されません.")
                 continue
 
             data.append((a, b, c))
@@ -71,19 +71,19 @@ def bitDP_max_path(data):
     # 隣接行列の作成
     adjacency_matrix = [[-1] * N for _ in range(N)]
     for u, v, w in data:
-        adjacency_matrix[id_map[u]][id_map[v]] = w  # ノード番号を1始まりに修正
+        adjacency_matrix[id_map[u]][id_map[v]] = w  # 隣接行列を更新
         adjacency_matrix[id_map[v]][id_map[u]] = w  # 無向グラフに対応
 
     # DP配列と遷移情報を記録する配列の作成
     max_path_dp = [[-1] * N for _ in range(1 << N)] # 最大経路を記録する配列
-    path_start  = [[-1] * N for _ in range(1 << N)] # 各経路の始点を記録する配列
+    #path_start  = [[-1] * N for _ in range(1 << N)] # 各経路の始点を記録する配列
     path_prev = [[-1] * N for _ in range(1 << N)] # 終点を記録する配列
-    cycle_check = [[-1] * N for _ in range(1 << N)]
+    #cycle_check = [[-1] * N for _ in range(1 << N)]
 
     # 初期状態
     for i in range(N):
         max_path_dp[1 << i][i] = 0
-        path_start[1 << i][i] = i
+        #path_start[1 << i][i] = i
 
     # bit DP
     max_length = 0
@@ -106,7 +106,7 @@ def bitDP_max_path(data):
                 if new_length > max_path_dp[new_state][k]: # より長い経路が見つかった場合
                     max_path_dp[new_state][k] = new_length # 最大経路の更新
                     path_prev[new_state][k] = j # 遷移元を記録
-                    path_start[new_state][k] = path_start[i][j] # 経路の始点の情報を更新
+                    #path_start[new_state][k] = path_start[i][j] # 経路の始点の情報を更新
 
                     # 最大経路を更新
                     if new_length > max_length:
@@ -114,6 +114,7 @@ def bitDP_max_path(data):
                         end_state = new_state
                         last_node = k
 
+    """
     # 探索した経路において終点から始点に移動できる場合の探索
     for i in range(1 << N): # 訪問済みの点の集合を表す状態i(2^N通り)
         for j in range(N): # 任意の点j
@@ -129,13 +130,15 @@ def bitDP_max_path(data):
                     if new_length > max_length: # 最大経路より新しい経路が長い場合
                         max_length = new_length # 最大経路の更新
                         end_state = i
+    """
+    #print(max_path_dp)
 
     # 経路の復元
     path = [] # 経路を格納するリスト
     state = end_state # 最大経路の状態
     node = last_node # 最大経路の最後の点
 
-    first_point = path_start[state][node] # 最大経路の始点
+    #first_point = path_start[state][node] # 最大経路の始点
 
     # 始点まで遡る
     while node != -1: # 1つ前に訪問した点がなくなるまで
@@ -148,8 +151,8 @@ def bitDP_max_path(data):
     path.reverse()  # 逆順なので反転
 
     # 最大経路の始点と終点が同じ点の場合, 始点を最後に追加
-    if cycle_check[end_state][last_node] == 1 and first_point is not None:
-        path.append(reverse_map[first_point])
+    #if cycle_check[end_state][last_node] == 1 and first_point is not None:
+    #    path.append(reverse_map[first_point])
 
     return max_length, path
 

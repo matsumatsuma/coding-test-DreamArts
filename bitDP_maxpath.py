@@ -33,6 +33,10 @@ def get_input():
             if a <= 0 or b <= 0:
                 print("駅IDは正の整数で入力してください.")
                 continue
+            # 始点と終点の駅IDが異なるか確認
+            if a == b:
+                print("始点IDと終点IDは異なるIDを指定してください. (同一駅をループする路線は入力できません.)")
+                continue
 
             data.append((a, b, c))
         
@@ -125,9 +129,7 @@ def bitDP_max_path(data):
                     if new_length > max_length: # 最大経路より新しい経路が長い場合
                         max_length = new_length # 最大経路の更新
                         end_state = i
-                        #last_node = start_node
 
-    
     # 経路の復元
     path = [] # 経路を格納するリスト
     state = end_state # 最大経路の状態
